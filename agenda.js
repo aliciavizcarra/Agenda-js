@@ -1,3 +1,5 @@
+"use strict";
+
 const Agenda = []; //Array donde almacenar eventos
 
 class Evento {
@@ -10,35 +12,63 @@ class Evento {
         this.alertas=alertas;
     }
 
-    agregarInvitado=function(Invitado){
-        invitados.push(Invitado)
+    agregarInvitado(){
+         
+        let nombre = prompt("Nombre del invitado/a")
+        let email = prompt("Email del invitado")
+
+        while(!email.includes("@")){
+            alert("El email no incluye @")
+            email = prompt("Email del invitado")
+        }
+
+        const nuevoInvitado= new Invitado(nombre,email)
+        this.invitados.push(nuevoInvitado)
     };
 
-    agregarAlerta=function(Alerta){
+    agregarAlerta(){
+
+        let nombre = prompt("Nombre de la alerta")
+
         alertas.push(Alerta)
     };
 
-   activarAlertas=function(alertas){
+    activarAlertas(){
+        
+        this.alertas.forEach(callbackfn)
 
-    alertas.forEach(element => {
-        tiempoAlerta=setTimeout(alert(element.mensaje),element.fecha_hora.getMiliseconds())
+
+        alertas.forEach(element => {
+            element.timerID=setTimeout(alert(element.mensaje),element.fecha_hora.getMiliseconds())
+
+
     });
     
    };
 
     mostrarEvento=function(){
-        document.write(`<h1>Eventos</h1>`)
-        document.write(this.toString)
-        //FALTA AÑADIR INVITADOS Y ALERTAS EN UNA <UL>
-    };
+        document.write(`<h1>Evento</h1>`)
+        document.write(Evento.toString)
+
+        document.write(`<h3>Invitados</h3>`)
+        document.write(`<ul>`)
+        invitados.forEach((element) => document.write(`<li>Nombre: ${element.nombre} </li> <br> 
+        <li> Email: ${element.email} </li>`))
+        document.write(`</ul>`)
+
+        document.write(`<h3>Alertas</h3>`)
+        document.write(`<ul>`)
+        alertas.forEach((element) => document.write(`<li>Fecha y Hora: ${element.fecha_hora}</li> <br> 
+        <li> Mensaje: ${element.mensaje} </li>`))
+        document.write(`<ul>`)
+    };  
 
     toString=function(){
 
-        return `Evento: ${nombre} <br>
+        return `Nombre: ${nombre} <br>
         Fecha: ${fecha_hora} <br>
-        Lugar: ${lugar}<br>
-        Invitados: ${invitados} <br>
-        Alertas: ${alertas} <br>`
+        Lugar: ${lugar}<br>`
+
     }
 
 
@@ -67,35 +97,77 @@ class Alerta {
 
 }
 
-function agregarEvento(Evento){
+
+
+//FUNCIONES DEL MENU
+function cargarAgenda(){
+
+    if(localStorage.getItem("agenda")!= null){
+        const agendaLs = JSON.parse(localStorage.getItem("agenda"));
+        agendaLs.forEach((element)=> {
+            let fecha = new Date(element.fecha_hora)
+            const eventoLs= new Evento (element.nombre,fecha,element.lugar, element.invitados, element.alertas); 
+            eventoLs.activarAlertas(); //NO TE OLVIDES DE ACTIVAR LAS ALERTAS
+            Agenda.push(eventoLs);  
+        });
+        alert("Agenda anterior cargada")
+    }else {
+        alert("No hay agenda anterior")
+    }
+}
+
+
+function guardarAgenda(){
+    localStorage.setItem("agenda", JSON.stringify(Agenda));
+}
+
+function agregarEvento(){
+
+
+    let nombre = prompt("Nombre del evento");
+
+    let fecha_hora = prompt("Fecha y hora del evento (Formato:AAAA-MM-DDTHH:MM)")
+    let fechaFinal = new Date(fecha_hora);
+    let lugar=prompt("FAlta")
+
+    const nuevoEvento = new Evento(nombre,fechaFinal,lugar);
+
+
+
+    //Evento=(nombre,fechaFinal,);
+
+
+    //AÑADIR INVITADOS
 
     let pregunta1 = confirm("¿Desea añadir invitados?")
 
-    if(pregunta1=== true){
+    while(pregunta1=== true){
 
-        let nombre = prompt("Nombre del invitado/a")
-        let email = prompt("Email del invitado")
-
-        while(!email.includes("@")){
-            alert("El email no incluye @")
-            email = prompt("Email del invitado")
-        }
-
-        const nuevoInvitado= new Invitado(nombre,email)
-        Evento.agregarInvitado(nuevoInvitado);
+       
+        nuevoEvento.agregarInvitado();
+        pregunta1=confirm("¿Desea añadir mas invitados?")
     }
+
+
+
+    //AÑADIR ALERTAS
 
     let pregunta2 = confirm("¿Desea añadir alertas?")
     
     if(pregunta2===true){
         let mensaje= prompt("¿Que mensaje desea mostrar?")
         let fecha_hora= prompt("Defina cuando desea que aparezca (Formato:AAAA-MM-DDTHH:MM)")
-        fecha_hora= new Date();
+        let fechaFinal = new Date(fecha_hora);
 
-        const nuevaAlerta= new Alerta(fecha_hora,mensaje)
+        const nuevaAlerta= new Alerta(fechaFinal,mensaje)
         Evento.agregarAlerta(nuevaAlerta);
-
     }
+
+}
+
+function mostrarEventos(){
+    Agenda.forEach((element)=>
+    element.mostrarEvento());
 }
 
 
