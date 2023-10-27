@@ -40,7 +40,7 @@ class Evento {
 
         this.alertas.forEach((element)=>{
 
-            //COMPARRA MILISEGUNDOS ( FOTO ISABEL)
+            //COMPARRA MILISEGUNDOS ( FOTO ISABEL)SD
 
             const fechaAlerta = new Date(element.fecha_hora);
 
