@@ -35,7 +35,19 @@ class Evento {
 
     activarAlertas(){
         
-        this.alertas.forEach(callbackfn)
+        const fechaHoy= new Date();
+
+
+        this.alertas.forEach((element)=>{
+
+            //COMPARRA MILISEGUNDOS ( FOTO ISABEL)
+
+            const fechaAlerta = new Date(element.fecha_hora);
+
+            if(fechaHoy<fechaAlerta)
+
+
+        })
 
 
         alertas.forEach(element => {
