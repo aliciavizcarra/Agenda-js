@@ -16,8 +16,8 @@
 
         agregarInvitado(){
             
-            const nombre = prompt("Nombre del invitado/a")
-            const email = prompt("Email del invitado")
+            let nombre = prompt("Nombre del invitado/a")
+            let email = prompt("Email del invitado")
 
             while(!email.includes("@")){
                 alert("El email no incluye @")
@@ -42,35 +42,27 @@
 
         activarAlertas(){   
 
-            const fechaHoy= new Date();
-
-            const actual = fechaHoy.getTime()
-
             this.alertas.forEach((element)=>{
-
-                const fechaAlerta = element.fecha_hora.getTime();
-
-                if(element.timerID == null && actual<fechaAlerta){
-
-                    const tiempoRestante = fechaAlerta - actual;
-
-                    element.timerID=setTimeout(alert(element.mensaje),tiempoRestante);
+                if(element.timerID == null){
+                    element.timerID=setTimeout(alert(element.mensaje),new Date(element.fecha_hora));
                 }
             })
-
         };
         
 
         mostrarEvento=function(){
             document.write(`<h1>Evento</h1>`)
-            document.write(this.toString)
+            document.write(`<p>Nombre: ${this.nombre} </p><br>`)
+            document.write(`<p>Lugar: ${this.lugar} </p><br>`)
+            document.write(`<p>Fecha: ${this.fecha_hora} </p><br>`)
 
+            
             document.write(`<h3>Invitados</h3>`)
             document.write(`<ul>`)
 
             this.invitados.forEach((element) => {
             document.write(`<li>Nombre: ${element.nombre} </li> <br>`);
-            document.write(`<li> Email: ${element.email} </li>`);
+            document.write(`<li> Email: ${element.email} </li> <br>`);
             });
 
             document.write(`</ul>`)
@@ -85,14 +77,6 @@
 
             document.write(`<ul>`)
         };  
-
-        toString=function(){
-
-            return `Nombre: ${this.nombre} <br>
-            Fecha: ${this.fecha_hora} <br>
-            Lugar: ${this.lugar}<br>`
-
-        }
 
     }
 
@@ -131,16 +115,18 @@
 
         //AÑADIR INVITADOS
 
-        const pregunta1 = confirm("¿Desea añadir invitados?")
+        let pregunta1 = confirm("¿Desea añadir invitados?")
 
         while(pregunta1 === true){
             nuevoEvento.agregarInvitado();
             pregunta1=confirm("¿Desea añadir mas invitados?")
         }
 
+        
+
         //AÑADIR ALERTAS
 
-        const pregunta2 = confirm("¿Desea añadir alertas?")
+        let pregunta2 = confirm("¿Desea añadir alertas?")
         
         while(pregunta2 === true){
         nuevoEvento.agregarAlerta();
@@ -181,8 +167,6 @@
     function modificarEvento(nombreEvento) {
 
         const evento = Agenda.find((evento) => evento.nombre === nombreEvento);
-    
-        const pregunta1 = confirm(`"¿Desea modificar el evento ${nombreEvento}"`)
         
         const menu = prompt("¿Qué desea modificar?\n 1. Nombre\n 2. Fecha y Hora\n 3. Lugar\n 4. Invitados\n 5. Alertas\n")
         const opcion = parseInt(menu);
@@ -191,27 +175,27 @@
         switch (opcion) {
 
             case 1:
-            const nuevoNombre = prompt("Nuevo nombre del evento");
+            let nuevoNombre = prompt("Nuevo nombre del evento");
             evento.nombre = nuevoNombre;
             break;
             case 2:
-            const nuevaFechaHora = prompt("Nueva fecha y hora (Formato: AAAA-MM-DDTHH:MM)");
+            let nuevaFechaHora = prompt("Nueva fecha y hora (Formato: AAAA-MM-DDTHH:MM)");
             evento.fecha_hora = new Date(nuevaFechaHora);
             break;
             case 3:
-            const nuevoLugar = prompt("Nuevo lugar");
+            let nuevoLugar = prompt("Nuevo lugar");
             evento.lugar = nuevoLugar;
             break;
             case 4:
             let pregunta = confirm("¿Desea añadir invitados?");
-            while (pregunta) {
+            while (pregunta == true) {
                 evento.agregarInvitado();
                 pregunta = confirm("¿Desea añadir más invitados?");
             }
             break;
             case 5:
             let preguntaAlerta = confirm("¿Desea añadir alertas?");
-            while (preguntaAlerta) {
+            while (preguntaAlerta == true) {
                 evento.agregarAlerta();
                 preguntaAlerta = confirm("¿Desea añadir más alertas?");
             }
@@ -225,10 +209,14 @@
     
 
     function desactivarAlertas(nombreEvento) {
-        nombreEvento.alertas.forEach((alerta) => {
+
+        const evento = Agenda.find((evento) => evento.nombre === nombreEvento);
+
+        evento.alertas.forEach((alerta) => {
           clearTimeout(alerta.timerID);
           alert("Alerta desactivada: " + alerta.mensaje);
         });
+
     }
 
     function cargarAgenda(){
@@ -252,19 +240,23 @@
     }
 
     function menu(){
-        const menu = prompt("¿Qué desea hacer? \n 1.Agregar evento a la agenda \n 2.Mostrar Eventos \n 3.Borrar evento \n 4.Borrar eventos pasados \n 5.Modificar un evento \n 6.Desactivar las alertas de un evento \n 7.Salir")
-        const opcion = parseInt(menu);
+    
+        let salir = false;
 
         do {
+
+            let menu = prompt("¿Qué desea hacer? \n 1.Agregar evento a la agenda \n 2.Mostrar Eventos \n 3.Borrar evento \n 4.Borrar eventos pasados \n 5.Modificar un evento \n 6.Desactivar las alertas de un evento \n 7.Salir")
+            let opcion = parseInt(menu);
 
             switch(opcion){
 
                 case 1:
-                    agregarEvento;
+                    agregarEvento();
                 break;
         
                 case 2:
-                    mostrarEventos;
+                    console.log(Agenda)
+                    mostrarEventos();
                 break;
         
                 case 3:
@@ -273,7 +265,7 @@
                 break;
         
                 case 4:
-                    borrarEventosPasados;
+                    borrarEventosPasados();
                 break;
         
                 case 5:
@@ -288,13 +280,14 @@
 
                 case 7:
                     alert("Saliendo del programa")
+                    salir=true;
                 break;
 
                 default:
                 alert("Opcion no válida")
             }
         
-        }while (menu !== "7")
+        }while (!salir)
 
     }
 
