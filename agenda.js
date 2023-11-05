@@ -1,7 +1,5 @@
     "use strict";
     
-    const Agenda = []; //Array donde almacenar eventos
-
     //CLASES (evento,alerta,invitado)
 
     class Evento {
@@ -133,40 +131,54 @@
         pregunta2= confirm("¿Desea añadir mas alertas?")
         }
 
-        Agenda.push(nuevoEvento);
+        guardarEventoenAgenda(nuevoEvento);
 
     }
 
     function mostrarEventos(){
-        Agenda.forEach((element)=>
+        const agenda = cargarAgenda();
+        agenda.forEach((element)=>
         element.mostrarEvento());
     }
 
     function borrarEvento(nombreEvento){
 
-        const indice = Agenda.findIndex((element) => element.nombre ===nombreEvento);
+        const agenda = cargarAgenda();
+
+        const indice = agenda.findIndex((element) => element.nombre ===nombreEvento);
         if (indice !== -1) {
-            Agenda.splice(indice, 1);
+            agenda.splice(indice, 1);
             alert(`Evento "${nombreEvento}" ha sido eliminado.`);
         } else {
             alert(`No se encontró ningún evento con el nombre "${nombreEvento}".`);
         }
+
+        localStorage.setItem("agenda",JSON.parse(agenda));
         
     }
 
 
     function borrarEventosPasados() {
+
+        const agenda = cargarAgenda();
+
         const fechaHoy = new Date().getTime();
-        Agenda.forEach((evento, index) => {
+
+        agenda.forEach((evento, index) => {
         if (evento.fecha_hora.getTime() < fechaHoy) {
-            Agenda.splice(index, 1);
+            agenda.splice(index, 1);
         }
+
+        localStorage.setItem("agenda",JSON.parse(agenda));
+
         });
     }
 
     function modificarEvento(nombreEvento) {
 
-        const evento = Agenda.find((evento) => evento.nombre === nombreEvento);
+        const agenda = cargarAgenda();
+
+        const evento = agenda.find((evento) => evento.nombre === nombreEvento);
         
         const menu = prompt("¿Qué desea modificar?\n 1. Nombre\n 2. Fecha y Hora\n 3. Lugar\n 4. Invitados\n 5. Alertas\n")
         const opcion = parseInt(menu);
@@ -210,16 +222,22 @@
 
     function desactivarAlertas(nombreEvento) {
 
-        const evento = Agenda.find((evento) => evento.nombre === nombreEvento);
+        const agenda = cargarAgenda();
+
+        const evento = agenda.find((evento) => evento.nombre === nombreEvento);
 
         evento.alertas.forEach((alerta) => {
           clearTimeout(alerta.timerID);
           alert("Alerta desactivada: " + alerta.mensaje);
         });
 
+        guardarAgenda();
+
     }
 
     function cargarAgenda(){
+
+        let agenda = [];
 
         if(localStorage.getItem("agenda")!== null){
             const agendaLs = JSON.parse(localStorage.getItem("agenda"));
@@ -227,16 +245,27 @@
                 let fecha = new Date(element.fecha_hora)
                 const eventoLs= new Evento (element.nombre,fecha,element.lugar, element.invitados, element.alertas); 
                 eventoLs.activarAlertas(); //NO TE OLVIDES DE ACTIVAR LAS ALERTAS
-                Agenda.push(eventoLs);  
+                agenda.push(eventoLs);  
             });
             alert("Agenda anterior cargada")
+            
         }else {
             alert("No hay agenda anterior")
         }
+
+        return agenda;
+     
     }
 
     function guardarAgenda(){
-        localStorage.setItem("agenda", JSON.stringify(Agenda));
+        const agenda = cargarAgenda();
+        localStorage.setItem("agenda", JSON.stringify(agenda));
+    }
+
+    function guardarEventoenAgenda(evento){
+        const agenda = cargarAgenda();
+        agenda.push(evento);
+        localStorage.setItem("agenda",JSON.stringify(agenda))
     }
 
     function menu(){
@@ -255,7 +284,6 @@
                 break;
         
                 case 2:
-                    console.log(Agenda)
                     mostrarEventos();
                 break;
         
